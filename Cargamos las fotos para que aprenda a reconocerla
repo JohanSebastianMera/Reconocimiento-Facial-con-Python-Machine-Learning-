@@ -1,0 +1,35 @@
+from typing import runtime_checkable
+from google.colab import drive
+drive.mount('/content/drive')
+
+Sebastian_image = face_recognition.load_image_file("/content/drive/MyDrive/sebas mera-luis jacome/Sebastian_Mera.jpeg")
+Sebastian_face_encoding = face_recognition.face_encodings(Sebastian_image)[0]
+
+Duver_image = face_recognition.load_image_file("/content/drive/MyDrive/sebas mera-luis jacome/Duver_Champutis.jpeg")
+Duver_face_encoding = face_recognition.face_encodings(Duver_image)[0]
+
+Jacome_image = face_recognition.load_image_file("/content/drive/MyDrive/sebas mera-luis jacome/jajas.jpg")
+Jacome_face_encoding = face_recognition.face_encodings(Jacome_image)[0]
+
+Juan_image = face_recognition.load_image_file("/content/drive/MyDrive/sebas mera-luis jacome/Juan_Rivera.jpeg")
+Juan_face_encoding = face_recognition.face_encodings(Juan_image)[0]
+
+Richard_image = face_recognition.load_image_file("/content/drive/MyDrive/Richard_Martinez.jpg")
+Richard_face_encoding = face_recognition.face_encodings(Richard_image)[0]
+
+
+
+known_face_encodings = [
+    Sebastian_face_encoding,
+    Duver_face_encoding,
+    Jacome_face_encoding,
+    Juan_face_encoding,
+    Richard_face_encoding,
+]
+known_face_names = [
+    "Johan",
+    "Duver",
+    "Luis",
+    "Juan",
+    "Richard"
+]
