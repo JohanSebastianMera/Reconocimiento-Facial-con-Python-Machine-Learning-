@@ -1,0 +1,66 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+def take_photo(filename='photo.jpg', quality=0.8):
+  js = Javascript('''
+    async function takePhoto(quality) {
+      const div = document.createElement('div');
+      const capture = document.createElement('button');
+      capture.textContent = 'Capture';
+      div.appendChild(capture);
+
+      const video = document.createElement('video');
+      video.style.display = 'block';
+      const stream = await navigator.mediaDevices.getUserMedia({video: true});
+
+      document.body.appendChild(div);
+      div.appendChild(video);
+      video.srcObject = stream;
+      await video.play();
+
+      // Resize the output to fit the video element.
+      google.colab.output.setIframeHeight(document.documentElement.scrollHeight, true);
+
+      // Wait for Capture to be clicked.
+      await new Promise((resolve) => capture.onclick = resolve);
+
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      stream.getVideoTracks()[0].stop();
+      div.remove();
+      return canvas.toDataURL('image/jpeg', quality);
+    }
+    ''')
+  display(js)
+
+  # get photo data
+  data = eval_js('takePhoto({})'.format(quality))
+  # get OpenCV format image
+  img = js_to_image(data)
+  #
+  #
+  #
+  face_locations = face_recognition.face_locations(img)
+  face_encodings = face_recognition.face_encodings(img, face_locations)
+  #
+  #
+  for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
+    matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
+    name = "Unknown"
+    face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
+    best_match_index = np.argmin(face_distances)
+    if matches[best_match_index]:
+      name = known_face_names[best_match_index]
+    cv2.rectangle(img, (left, top), (right, bottom), (0, 0, 255), 2)
+    cv2.rectangle(img, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+    font = cv2.FONT_HERSHEY_DUPLEX
+    cv2.putText(img, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+  # draw face bounding box on image
+  #for (x,y,w,h) in faces:
+      #img = cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+  # save image
+  cv2.imwrite(filename, img)
+
+  return filename
